@@ -99,10 +99,50 @@ def execute(s,regsin,regdictin,length):
         elif int(s[1]) > -1:
             print(f'Can not access command with index {int(s[1])}')
 
-regs = [0,0,0]
+    elif s[0] == 'IF':
+        if len(s) < 5:
+            print('Syntax error')
+
+        k=0
+        st1,st2 = [],[]
+
+        while s[k] != 'else':
+            k += 1
+
+        for i in range(5, k):
+            st1.append(s[i])
+
+        for i in range(k+1, len(s)):
+            st2.append(s[i])
+
+        if s[3] == '=':
+            if int(s[2])==int(s[4]):
+                execute(st1,regsin,regdictin,length)
+                ECX+=3
+            else:
+                execute(st2, regsin, regdictin, length)
+                ECX += 3
+                
+        elif s[3] == '>':
+            if int(s[2])>int(s[4]):
+                execute(st1,regsin,regdictin,length)
+                ECX+=3
+            else:
+                execute(st2, regsin, regdictin, length)
+                ECX += 3
+                
+        elif s[3]=='<':
+            if int(s[2])==int(s[4]):
+                execute(st1,regsin,regdictin,length)
+                ECX+=3
+            else:
+                execute(st2, regsin, regdictin, length)
+                ECX += 3
+        
+regs = [0,0,0,0,0]
 ECX = -1
 STACK = 0
-RegDict = {'EAX' : 0,'EBX' : 1,'EDX' : 2}
+RegDict = {'EAX' : 0,'EBX' : 1,'EDX' : 2,'EFX' : 3,'EGX' : 4}
 
 commands = []
 
