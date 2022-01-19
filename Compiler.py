@@ -1,6 +1,8 @@
 def execute(s,regsin,regdictin,length):
     global ECX,error
 
+    #print(len(s),s)
+
     if s[0] == 'READ':
         if len(s) != 2:
             print('Syntax error')
@@ -10,7 +12,7 @@ def execute(s,regsin,regdictin,length):
             regsin[regdictin[s[1]]] = int(input())
             ECX += 1
         else:
-            print(f'Can not access requested register({s[1]},line{ECX})')
+            print(f'Can not access requested register({s[1]},line: {ECX+1})')
             error=True
 
     elif s[0] == 'WRITE':
@@ -22,7 +24,7 @@ def execute(s,regsin,regdictin,length):
             print(regsin[regdictin[s[1]]])
             ECX += 1
         else:
-            print(f'Can not access requested register({s[1]},line{ECX})')
+            print(f'Can not access requested register({s[1]},line: {ECX+1})')
             error = True
 
     elif s[0] == 'ADD':
@@ -34,7 +36,7 @@ def execute(s,regsin,regdictin,length):
             regsin[regdictin[s[3]]] = regsin[regdictin[s[1]]]+regsin[regdictin[s[2]]]
             ECX += 1
         else:
-            print(f'Can not access requested register({s[1]},line{ECX})')
+            print(f'Can not access requested register({s[1]},line: {ECX+1})')
             error = True
 
     elif s[0] == 'SUB':
@@ -46,7 +48,7 @@ def execute(s,regsin,regdictin,length):
             regsin[regdictin[s[3]]] = regsin[regdictin[s[1]]] - regsin[regdictin[s[2]]] if regsin[regdictin[s[1]]] - regsin[regdictin[s[2]]]>=0 else 0
             ECX += 1
         else:
-            print(f'Can not access requested register({s[1]},line{ECX})')
+            print(f'Can not access requested register({s[1]},line: {ECX+1})')
             error = True
 
     elif s[0] == 'MUL':
@@ -58,7 +60,7 @@ def execute(s,regsin,regdictin,length):
             regsin[regdictin[s[3]]] = regsin[regdictin[s[1]]] * regsin[regdictin[s[2]]]
             ECX += 1
         else:
-            print(f'Can not access requested register({s[1]},line{ECX})')
+            print(f'Can not access requested register({s[1]},line: {ECX+1})')
             error = True
 
     elif s[0] == 'DEV':
@@ -70,7 +72,7 @@ def execute(s,regsin,regdictin,length):
             regsin[regdictin[s[3]]] = regsin[regdictin[s[1]]] // regsin[regdictin[s[2]]]
             ECX += 1
         else:
-            print(f'Can not access requested register({s[1]},line{ECX})')
+            print(f'Can not access requested register({s[1]},line: {ECX+1})')
             error = True
 
     elif s[0] == 'MOD':
@@ -82,7 +84,7 @@ def execute(s,regsin,regdictin,length):
             regsin[regdictin[s[3]]] = regsin[regdictin[s[1]]] % regsin[regdictin[s[2]]]
             ECX += 1
         else:
-            print(f'Can not access requested register({s[1]},line{ECX})')
+            print(f'Can not access requested register({s[1]},line: {ECX+1})')
             error = True
 
     elif s[0] == 'MOV':
@@ -93,11 +95,11 @@ def execute(s,regsin,regdictin,length):
         if s[1] in regdictin and s[2] in regdictin:
             regsin[regdictin[s[2]]] = regsin[regdictin[s[1]]]
             ECX+=1
-        elif s[1] in regdictin:
+        elif s[2] in regdictin:
             regsin[regdictin[s[2]]] = int(s[1])
             ECX += 1
         else:
-            print(f'Can not access requested register({s[1]},line{ECX})')
+            print(f'Can not access requested register({s[2]},line: {ECX+1})')
             error = True
 
     elif s[0] == 'JMP':
@@ -105,8 +107,8 @@ def execute(s,regsin,regdictin,length):
             print('Syntax error')
             error = True
 
-        if int(s[1]) > -1 and int(s[1]) <=length:
-            ECX = int(s[1])
+        if int(s[1])+1 > 0 and int(s[1]) <=length:
+            ECX = int(s[1])-1
         else:
             print(f'Can not access command with index {int(s[1])}')
             error = True
@@ -117,7 +119,7 @@ def execute(s,regsin,regdictin,length):
             error = True
 
         if int(s[1]) > -1 and regsin[regdictin['EDX']] == 0:
-            ECX = int(s[1])
+            ECX = int(s[1])-1
         elif int(s[1]) > -1:
             print(f'Can not access command with index {int(s[1])}')
             error = True
@@ -129,11 +131,21 @@ def execute(s,regsin,regdictin,length):
 
         st1,st2 = [],[]
         pas = False
+        
+        try:
+            op1 = int(s[1])
+        except:
+            op1 = regsin[regdictin[s[1]]]
+
+        try:
+            op2 = int(s[3])
+        except:
+            op2 = regsin[regdictin[s[3]]]
 
         if 'ELSE' in s:
             k = s.index('ELSE')
 
-            for i in range(5, k):
+            for i in range(4, k):
                 st1.append(s[i])
 
             for i in range(k+1, len(s)):
@@ -141,29 +153,26 @@ def execute(s,regsin,regdictin,length):
         else:
             pas = True
 
-        if s[3] == '=':
-            if int(s[2])==int(s[4]):
+            for i in range(4, len(s)):
+                st1.append(s[i])
+
+        if s[2] == '=':
+            if op1==op2:
                 execute(st1,regsin,regdictin,length)
-                ECX+=3
             elif not(pas):
                 execute(st2, regsin, regdictin, length)
-                ECX += 3
 
-        elif s[3] == '>':
-            if int(s[2])>int(s[4]):
+        elif s[2] == '>':
+            if op1>op2:
                 execute(st1,regsin,regdictin,length)
-                ECX+=3
             elif not (pas):
                 execute(st2, regsin, regdictin, length)
-                ECX += 3
 
-        elif s[3]=='<':
-            if int(s[2])==int(s[4]):
+        elif s[2]=='<':
+            if op1==op2:
                 execute(st1,regsin,regdictin,length)
-                ECX+=3
             elif not (pas):
                 execute(st2, regsin, regdictin, length)
-                ECX += 3
 
 regs = [0,0,0]
 ECX = 0
@@ -173,16 +182,21 @@ error = False
 
 commands = []
 
-f = open('C:/Users/smoln/Desktop/1.txt')
+f = open('1.txt')
 
-while True and not error:
+while True:
     s = f.readline()
 
     if s=='':
         break
 
     commands.append(s.split())
-print(commands)
+#print(commands)
 
-while ECX <= len(commands):
-    execute(commands[ECX],regs,RegDict,len(commands))
+while ECX <= len(commands)-1 and not error:
+    try:
+        execute(commands[ECX],regs,RegDict,len(commands))
+    except:
+        print(commands[ECX],len(commands[ECX]))
+        break
+    print(regs[0],regs[1])
