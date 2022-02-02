@@ -169,7 +169,7 @@ def execute(s,regsin,regdictin,length):
                 execute(st2, regsin, regdictin, length)
 
         elif s[2]=='<':
-            if op1==op2:
+            if op1<op2:
                 execute(st1,regsin,regdictin,length)
             elif not (pas):
                 execute(st2, regsin, regdictin, length)
